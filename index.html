@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f9f3f5">
+  <title>Meu quadro — Milena Nascimento</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @keyframes task-enter { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .animate-task-enter { animation: task-enter .32s cubic-bezier(.2,.7,.25,1) both; }
+    @media (prefers-reduced-motion: reduce) { .animate-task-enter { animation: none; } }
+    @theme {
+      --color-rose-50: #fbf6f8;
+      --color-rose-100: #f5e8ed;
+      --color-rose-200: #e9cbd6;
+      --color-rose-300: #d8a7b9;
+      --color-rose-400: #bf8296;
+      --color-rose-500: #a96d83;
+      --color-rose-600: #9a5872;
+      --color-rose-700: #81445d;
+      --color-rose-900: #38252e;
+      --font-sans: 'Nunito', sans-serif;
+      --font-display: 'Nunito', sans-serif;
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-rose-50 font-sans text-zinc-800 antialiased">
+  <section id="auth-screen" class="fixed inset-0 z-40 flex items-center justify-center bg-rose-50/90 p-5 backdrop-blur-sm" aria-labelledby="auth-title">
+    <form id="auth-form" class="w-full max-w-sm rounded-3xl border border-rose-100 bg-white p-7 shadow-xl shadow-rose-900/10 sm:p-9">
+      <img class="mx-auto mb-5 h-16 w-28 object-contain" src="assets/monograma-mn-transparente.png" alt="Milena Nascimento — monograma MN">
+      <p class="mb-1 text-center text-[10px] font-bold uppercase tracking-[.18em] text-rose-700">Seu espaço de trabalho</p>
+      <h1 id="auth-title" class="mb-2 text-center font-display text-2xl font-bold text-zinc-800">Entrar</h1>
+      <p id="auth-description" class="mb-6 text-center text-xs leading-relaxed text-zinc-500">Entre para acessar e sincronizar suas tarefas.</p>
+      <label class="mb-3 block"><span class="mb-1.5 block text-[10px] font-bold tracking-wide text-zinc-500">E-MAIL</span><input id="auth-email" type="email" autocomplete="email" required placeholder="voce@email.com" class="w-full rounded-xl border border-rose-100 px-3 py-3 text-sm outline-none placeholder:text-zinc-400 focus:border-rose-400 focus:ring-2 focus:ring-rose-100"></label>
+      <label class="mb-4 block"><span class="mb-1.5 block text-[10px] font-bold tracking-wide text-zinc-500">SENHA</span><input id="auth-password" type="password" autocomplete="current-password" minlength="6" required placeholder="Mínimo de 6 caracteres" class="w-full rounded-xl border border-rose-100 px-3 py-3 text-sm outline-none placeholder:text-zinc-400 focus:border-rose-400 focus:ring-2 focus:ring-rose-100"></label>
+      <p id="auth-message" class="mb-3 min-h-5 text-center text-xs text-rose-700" role="status" aria-live="polite"></p>
+      <button id="auth-submit" type="submit" class="w-full rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50">Entrar</button>
+      <button id="auth-toggle" type="button" class="mt-4 w-full text-center text-xs font-semibold text-rose-700 hover:text-rose-900">Criar uma conta</button>
+      <div id="auth-config-warning" class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-[11px] leading-relaxed text-amber-900" hidden>Para ativar o login, configure a URL do projeto e a chave pública em <code>supabase-config.js</code>. Depois, execute <code>supabase/schema.sql</code> no SQL Editor do Supabase.</div>
+    </form>
+  </section>
+
+  <main class="mx-auto max-w-7xl px-5 py-7 sm:px-8 lg:px-14 lg:py-12">
+    <header class="mb-10 flex items-center justify-between lg:mb-14">
+      <img class="h-[72px] w-[124px] object-contain object-left sm:h-[86px] sm:w-[148px]" src="assets/monograma-mn-transparente.png" alt="Milena Nascimento — monograma MN">
+      <div id="account-bar" class="hidden items-center gap-3"><span id="account-email" class="max-w-48 truncate text-xs text-zinc-500"></span><button id="sign-out" type="button" class="rounded-lg border border-rose-200 bg-white px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-50">Sair</button></div>
+    </header>
+
+    <section class="mb-7 flex items-end justify-between gap-4" aria-labelledby="page-title">
+      <div>
+        <p class="mb-2 text-[10px] font-bold uppercase tracking-[.18em] text-rose-700">Seu espaço de trabalho</p>
+        <h1 id="page-title" class="font-display text-3xl font-semibold tracking-tight text-zinc-800 sm:text-4xl">Meu quadro</h1>
+        <p class="mt-2 text-sm text-zinc-500">Organize suas ideias. Faça acontecer.</p>
+      </div>
+      <button id="add-task" type="button" class="inline-flex shrink-0 items-center gap-2 rounded-xl bg-rose-600 px-4 py-3 text-xs font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-rose-700 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-500">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Nova tarefa
+      </button>
+    </section>
+
+    <section class="mb-6 flex flex-wrap items-center gap-2.5" aria-label="Controles do quadro">
+      <label class="flex h-10 w-full max-w-xs items-center gap-2.5 rounded-xl border border-rose-100 bg-white px-3 text-zinc-400 shadow-sm focus-within:border-rose-300 focus-within:ring-2 focus-within:ring-rose-100">
+        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3" stroke="currentColor" stroke-width="1.6"/><path d="m15.5 15.5 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input id="search-tasks" type="search" placeholder="Buscar tarefas..." aria-label="Buscar tarefas" class="w-full bg-transparent text-xs text-zinc-700 outline-none placeholder:text-zinc-400">
+      </label>
+      <label class="flex h-10 items-center gap-2 rounded-xl border border-rose-100 bg-white px-3 text-[11px] text-zinc-500 shadow-sm">
+        <span>Categoria</span>
+        <select id="filter-tag" aria-label="Filtrar por categoria" class="cursor-pointer border-0 bg-transparent text-xs font-medium text-zinc-700 outline-none">
+          <option value="all">Todas</option><option value="verde">Pessoal</option><option value="azul">Trabalho</option><option value="terracota">Ideia</option><option value="amarelo">Prioridade</option><option value="rosa">Estudo</option>
+        </select>
+      </label>
+      <span class="ml-auto hidden items-center gap-2 text-[11px] text-zinc-400 md:flex">Arraste para mover · <kbd class="rounded border border-rose-200 bg-white px-1.5 py-0.5 text-[10px]">N</kbd> nova tarefa · <kbd class="rounded border border-rose-200 bg-white px-1.5 py-0.5 text-[10px]">/</kbd> buscar</span>
+    </section>
+
+    <section class="mb-6 rounded-2xl border border-rose-100 bg-white/80 p-4 shadow-sm sm:flex sm:items-center sm:gap-5" aria-label="Progresso das tarefas"><div class="mb-3 flex min-w-40 items-center justify-between gap-5 sm:mb-0 sm:block"><p class="text-[10px] font-bold uppercase tracking-wider text-rose-700">Seu progresso</p><p id="progress-copy" class="mt-1 text-[11px] text-zinc-500">0 de 0 tarefas concluídas</p></div><div class="h-2 flex-1 overflow-hidden rounded-full bg-rose-100"><div id="progress-bar" class="h-full w-0 rounded-full bg-rose-500 transition-all duration-700 ease-out motion-reduce:transition-none"></div></div><p id="progress-percent" class="min-w-10 text-right font-display text-sm font-extrabold text-rose-700">0%</p></section>
+    <section class="grid grid-cols-1 gap-7 md:grid-cols-3 md:gap-5" aria-label="Quadro de tarefas">
+      <section class="column min-w-0" data-status="todo">
+        <header class="mb-3 flex h-11 items-start justify-between border-t-2 border-rose-200 pt-3">
+          <div class="flex items-center gap-2.5 font-display text-xs font-semibold"><span class="h-2 w-2 rounded-full bg-zinc-300"></span>A fazer <span class="count rounded-full bg-rose-100 px-2 py-1 text-[10px] font-semibold text-zinc-500">0</span></div>
+          <button class="grid h-6 w-6 place-items-center rounded-lg text-zinc-400 transition hover:bg-rose-100 hover:text-rose-700" type="button" data-add="todo" aria-label="Adicionar tarefa em A fazer"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+        </header><div class="task-list flex min-h-[6rem] flex-col gap-2.5 rounded-xl pb-3 transition-colors" id="list-todo"></div><div class="empty hidden rounded-xl border border-dashed border-rose-200 bg-white/60 px-3 py-6 text-center text-[11px] text-zinc-400">Solte uma tarefa aqui</div>
+      </section>
+      <section class="column min-w-0" data-status="doing">
+        <header class="mb-3 flex h-11 items-start justify-between border-t-2 border-rose-300 pt-3">
+          <div class="flex items-center gap-2.5 font-display text-xs font-semibold"><span class="h-2 w-2 rounded-full bg-rose-400"></span>Em andamento <span class="count rounded-full bg-rose-100 px-2 py-1 text-[10px] font-semibold text-zinc-500">0</span></div>
+          <button class="grid h-6 w-6 place-items-center rounded-lg text-zinc-400 transition hover:bg-rose-100 hover:text-rose-700" type="button" data-add="doing" aria-label="Adicionar tarefa em Em andamento"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+        </header><div class="task-list flex min-h-[6rem] flex-col gap-2.5 rounded-xl pb-3 transition-colors" id="list-doing"></div><div class="empty hidden rounded-xl border border-dashed border-rose-200 bg-white/60 px-3 py-6 text-center text-[11px] text-zinc-400">Solte uma tarefa aqui</div>
+      </section>
+      <section class="column min-w-0" data-status="done">
+        <header class="mb-3 flex h-11 items-start justify-between border-t-2 border-rose-500 pt-3">
+          <div class="flex items-center gap-2.5 font-display text-xs font-semibold"><span class="h-2 w-2 rounded-full bg-rose-600"></span>Concluída <span class="count rounded-full bg-rose-100 px-2 py-1 text-[10px] font-semibold text-zinc-500">0</span></div>
+          <button class="grid h-6 w-6 place-items-center rounded-lg text-zinc-400 transition hover:bg-rose-100 hover:text-rose-700" type="button" data-add="done" aria-label="Adicionar tarefa em Concluída"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+        </header><div class="task-list flex min-h-[6rem] flex-col gap-2.5 rounded-xl pb-3 transition-colors" id="list-done"></div><div class="empty hidden rounded-xl border border-dashed border-rose-200 bg-white/60 px-3 py-6 text-center text-[11px] text-zinc-400">Solte uma tarefa aqui</div>
+      </section>
+    </section>
+
+    <footer class="mt-8 flex justify-between border-t border-rose-100 pt-4 text-[10px] text-zinc-400">
+      <span>Mova cartões arrastando ou pelo seletor em cada tarefa.</span><span><b id="task-total" class="font-semibold text-zinc-600">0</b> tarefas no quadro</span>
+    </footer>
+  </main>
+
+  <div id="modal-backdrop" class="fixed inset-0 z-20 hidden items-center justify-center bg-zinc-950/45 p-4 opacity-0 transition-opacity duration-200" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <form id="task-form" class="w-full max-w-md scale-95 rounded-2xl bg-white p-6 opacity-0 shadow-2xl shadow-rose-950/20 transition duration-200">
+      <div class="mb-5 flex items-center justify-between"><h2 id="modal-title" class="font-display text-base font-bold tracking-tight">Nova tarefa</h2><button class="grid h-8 w-8 place-items-center rounded-lg text-xl text-zinc-400 hover:bg-rose-50 hover:text-zinc-700" type="button" id="close-modal" aria-label="Fechar">×</button></div>
+      <label class="mb-4 block"><span class="mb-1.5 block text-[10px] font-bold tracking-wide text-zinc-500">TÍTULO</span><input name="title" maxlength="90" placeholder="O que você precisa fazer?" required class="w-full rounded-lg border border-rose-100 bg-white px-3 py-2.5 text-xs text-zinc-800 outline-none placeholder:text-zinc-400 focus:border-rose-400 focus:ring-2 focus:ring-rose-100"></label>
+      <label class="mb-4 block"><span class="mb-1.5 block text-[10px] font-bold tracking-wide text-zinc-500">DESCRIÇÃO</span><textarea name="description" maxlength="280" placeholder="Adicione alguns detalhes (opcional)" class="h-20 w-full resize-y rounded-lg border border-rose-100 bg-white px-3 py-2.5 text-xs text-zinc-800 outline-none placeholder:text-zinc-400 focus:border-rose-400 focus:ring-2 focus:ring-rose-100"></textarea></label>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="block"><span class="mb-1.5 block text-[10px] font-bold tracking-wide text-zinc-500">CATEGORIA</span><select name="tag" class="w-full rounded-lg border border-rose-100 bg-white px-3 py-2.5 text-xs text-zinc-700 outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100"><option value="verde">Pessoal</option><option value="azul">Trabalho</option><option value="terracota">Ideia</option><option value="amarelo">Prioridade</option><option value="rosa">Estudo</option></select></label>
+        <label class="block"><span class="mb-1.5 block text-[10px] font-bold tracking-wide text-zinc-500">COLUNA</span><select name="status" class="w-full rounded-lg border border-rose-100 bg-white px-3 py-2.5 text-xs text-zinc-700 outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100"><option value="todo">A fazer</option><option value="doing">Em andamento</option><option value="done">Concluída</option></select></label>
+      </div>
+      <div class="mt-6 flex justify-end gap-2"><button class="rounded-lg border border-rose-100 bg-white px-4 py-2.5 text-[11px] font-semibold text-zinc-600 hover:bg-rose-50" type="button" id="cancel-modal">Cancelar</button><button class="save rounded-lg bg-rose-600 px-4 py-2.5 text-[11px] font-semibold text-white hover:bg-rose-700" type="submit">Salvar tarefa</button></div>
+    </form>
+  </div>
+  <div id="toast" class="pointer-events-none fixed bottom-7 left-1/2 z-30 -translate-x-1/2 translate-y-3 rounded-xl bg-rose-900 px-4 py-2.5 text-xs text-white opacity-0 shadow-lg transition-all" role="status" aria-live="polite"></div>
+
+  <script src="./supabase-config.js"></script>
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.117.1';
+    (async()=>{
+      const KEY='meu-quadro-tarefas-v1';let storageKey=KEY;let currentUser=null;let activeUserId=null;
+      const config=window.SUPABASE_CONFIG||{};
+      const supabaseClient=config.url&&config.anonKey?createClient(config.url,config.anonKey):null;
+      const defaults=[
+        {id:'seed-1',title:'Planejar a semana',description:'Separar um tempo para organizar as prioridades.',tag:'verde',status:'todo',date:'Hoje'},
+        {id:'seed-2',title:'Revisar apresentação',description:'Dar uma última olhada nos slides antes de compartilhar.',tag:'azul',status:'todo',date:'Amanhã'},
+        {id:'seed-3',title:'Rascunhar ideias para o projeto',description:'Anotar possibilidades sem se preocupar em acertar de primeira.',tag:'terracota',status:'doing',date:'Esta semana'},
+        {id:'seed-4',title:'Responder mensagens importantes',description:'',tag:'amarelo',status:'done',date:'Concluída'}
+      ];
+      const labels={verde:'Pessoal',azul:'Trabalho',terracota:'Ideia',amarelo:'Prioridade',rosa:'Estudo'};
+      const tagClasses={verde:'bg-rose-100 text-rose-800',azul:'bg-slate-100 text-slate-600',terracota:'bg-orange-50 text-orange-800',amarelo:'bg-amber-50 text-amber-800',rosa:'bg-pink-50 text-pink-800'};
+      const lists={todo:document.querySelector('#list-todo'),doing:document.querySelector('#list-doing'),done:document.querySelector('#list-done')};
+      const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      let tasks=readTasks(KEY,defaults);
+      function readTasks(key,fallback=[]){try{const saved=JSON.parse(localStorage.getItem(key));return Array.isArray(saved)?saved:fallback}catch{return fallback}}
+      function persist(){try{localStorage.setItem(storageKey,JSON.stringify(tasks))}catch{}}
+      function rowToTask(row){return{id:row.id,title:row.title,description:row.description||'',tag:row.category,status:row.status,date:row.date_label||''}}
+      function taskToRow(task){return{id:task.id,user_id:currentUser.id,title:task.title,description:task.description||'',category:task.tag,status:task.status,date_label:task.date||''}}
+      async function syncTask(task){if(!supabaseClient||!currentUser)return;const{error}=await supabaseClient.from('tasks').upsert(taskToRow(task));if(error)toast('Não foi possível sincronizar: '+error.message)}
+      async function loadCloudTasks(user){
+        const scopedKey=`${KEY}:${user.id}`;const cached=localStorage.getItem(scopedKey);const legacy=localStorage.getItem(KEY);
+        const{data,error}=await supabaseClient.from('tasks').select('id,title,description,category,status,date_label,created_at').order('created_at',{ascending:true});
+        if(error){toast('Erro ao carregar tarefas: '+error.message);tasks=readTasks(scopedKey,readTasks(KEY,[]));storageKey=scopedKey;render(false);return}
+        let rows=data||[];
+        const localToMigrate=rows.length===0?(cached?readTasks(scopedKey,[]):legacy?readTasks(KEY,[]):[]):[];
+        if(localToMigrate.length){
+          const uuidPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+          const migration=localToMigrate.map(t=>({...t,id:uuidPattern.test(t.id)?t.id:crypto.randomUUID()}));
+          const payload=migration.map(t=>({id:t.id,user_id:user.id,title:t.title,description:t.description||'',category:t.tag||'verde',status:t.status||'todo',date_label:t.date||''}));
+          const result=await supabaseClient.from('tasks').upsert(payload,{onConflict:'id',ignoreDuplicates:true});
+          if(result.error){toast('Erro ao importar tarefas: '+result.error.message);tasks=localToMigrate;storageKey=cached?scopedKey:KEY;render(false);return}
+          if(!cached&&legacy)localStorage.removeItem(KEY);
+          const refreshed=await supabaseClient.from('tasks').select('id,title,description,category,status,date_label,created_at').order('created_at',{ascending:true});
+          if(refreshed.error){toast('Erro ao carregar tarefas: '+refreshed.error.message);return}
+          rows=refreshed.data||[];
+        }
+        tasks=rows.map(rowToTask);storageKey=scopedKey;persist();render(false);
+      }
+      async function activateSession(user){if(!user||activeUserId===user.id)return;activeUserId=user.id;currentUser=user;document.querySelector('#auth-screen').classList.add('hidden');const bar=document.querySelector('#account-bar');bar.classList.remove('hidden');bar.classList.add('flex');document.querySelector('#account-email').textContent=user.email||'';await loadCloudTasks(user)}
+      function showSignedOut(){activeUserId=null;currentUser=null;tasks=[];storageKey=KEY;persist();render(false);document.querySelector('#account-bar').classList.add('hidden');document.querySelector('#account-bar').classList.remove('flex');document.querySelector('#auth-screen').classList.remove('hidden')}
+      function render(animateCards=true){
+        const query=document.querySelector('#search-tasks').value.trim().toLocaleLowerCase('pt-BR'),tagFilter=document.querySelector('#filter-tag').value;
+        const visible=tasks.filter(t=>(tagFilter==='all'||t.tag===tagFilter)&&(!query||`${t.title} ${t.description||''} ${labels[t.tag]||''}`.toLocaleLowerCase('pt-BR').includes(query)));
+        for(const status of Object.keys(lists)){
+          const items=visible.filter(t=>t.status===status);
+          lists[status].innerHTML=items.map(t=>`<article class="task-card ${animateCards?'animate-task-enter':''} group cursor-grab touch-none select-none rounded-xl border border-rose-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-md active:cursor-grabbing" draggable="true" data-id="${esc(t.id)}" aria-label="${esc(t.title)}. Arraste para mudar de coluna"><div class="text-[13px] font-semibold leading-relaxed text-zinc-800">${esc(t.title)}</div>${t.description?`<p class="mt-1.5 text-[11px] leading-relaxed text-zinc-500">${esc(t.description)}</p>`:''}<div class="mt-3 flex flex-wrap items-center gap-2"><span class="rounded-md px-2 py-1 text-[9px] font-medium ${tagClasses[t.tag]||tagClasses.verde}">${esc(labels[t.tag]||'Pessoal')}</span><span class="ml-auto text-[9px] text-zinc-400">${esc(t.date||'')}</span></div><div class="mt-2 flex w-full items-center justify-end gap-1.5"><select class="task-move max-w-28 cursor-pointer rounded-md bg-rose-50 px-2 py-1.5 text-[9px] text-zinc-600 outline-none hover:bg-rose-100" aria-label="Mover ${esc(t.title)} para outra coluna"><option value="todo" ${t.status==='todo'?'selected':''}>A fazer</option><option value="doing" ${t.status==='doing'?'selected':''}>Em andamento</option><option value="done" ${t.status==='done'?'selected':''}>Concluída</option></select><button class="task-edit rounded-md px-2 py-1 text-xs text-zinc-400 hover:bg-rose-50 hover:text-rose-700" type="button" aria-label="Editar ${esc(t.title)}" title="Editar tarefa">✎</button><button class="task-delete rounded-md px-2 py-1 text-sm text-zinc-400 hover:bg-rose-50 hover:text-rose-700" type="button" aria-label="Excluir ${esc(t.title)}" title="Excluir tarefa">×</button></div></article>`).join('');
+          lists[status].parentElement.querySelector('.count').textContent=items.length;
+          const empty=lists[status].parentElement.querySelector('.empty');empty.textContent=query||tagFilter!=='all'?'Nenhuma tarefa encontrada':'Solte uma tarefa aqui';empty.classList.toggle('hidden',items.length!==0);
+        }
+        document.querySelector('#task-total').textContent=tasks.length;const completed=tasks.filter(t=>t.status==='done').length,total=tasks.length,percent=total?Math.round(completed/total*100):0;document.querySelector('#progress-copy').textContent=total?`${completed} de ${total} tarefas concluídas`:'Adicione tarefas para começar';document.querySelector('#progress-percent').textContent=`${percent}%`;document.querySelector('#progress-bar').style.width=`${percent}%`;bindCards();
+      }
+      let pointerDrag=null;
+      function clearDropTargets(){document.querySelectorAll('.task-list').forEach(l=>l.classList.remove('bg-rose-100','ring-8','ring-rose-100'))}
+      async function moveTask(id,status){const t=tasks.find(x=>x.id===id);if(!t||t.status===status)return;t.status=status;if(status==='done')t.date='Concluída';else if(t.date==='Concluída')t.date='';persist();render();await syncTask(t);toast(status==='done'?'Tarefa concluída! ✨':'Tarefa movida')}
+      document.addEventListener('pointermove',e=>{if(!pointerDrag)return;const dx=e.clientX-pointerDrag.x,dy=e.clientY-pointerDrag.y;if(!pointerDrag.started&&Math.hypot(dx,dy)>6){pointerDrag.started=true;pointerDrag.card.classList.add('opacity-60','scale-[1.02]','shadow-xl')}if(!pointerDrag.started)return;e.preventDefault();clearDropTargets();const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.task-list');if(target)target.classList.add('bg-rose-100','ring-8','ring-rose-100')},{passive:false});
+      document.addEventListener('pointerup',e=>{if(!pointerDrag)return;const drag=pointerDrag;pointerDrag=null;clearDropTargets();drag.card.classList.remove('opacity-60','scale-[1.02]','shadow-xl');if(drag.started){const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.task-list');if(target)moveTask(drag.card.dataset.id,target.id.replace('list-',''))}});
+      function bindCards(){document.querySelectorAll('.task-card').forEach(card=>{card.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('button,select'))return;pointerDrag={card,x:e.clientX,y:e.clientY,started:false}});card.addEventListener('dragstart',e=>{card.classList.add('opacity-40','rotate-1');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',card.dataset.id)});card.addEventListener('dragend',()=>{card.classList.remove('opacity-40','rotate-1');clearDropTargets()});card.querySelector('.task-move').addEventListener('change',e=>moveTask(card.dataset.id,e.target.value));card.querySelector('.task-edit').addEventListener('click',()=>editTask(card.dataset.id));card.querySelector('.task-delete').addEventListener('click',async()=>{const task=tasks.find(t=>t.id===card.dataset.id);tasks=tasks.filter(t=>t.id!==card.dataset.id);persist();render();if(supabaseClient&&currentUser){const{error}=await supabaseClient.from('tasks').delete().eq('id',card.dataset.id);if(error){if(task)tasks.push(task);persist();render(false);toast('Erro ao excluir: '+error.message);return}}toast('Tarefa removida')})})}
+      Object.entries(lists).forEach(([status,list])=>{list.addEventListener('dragover',e=>{e.preventDefault();list.classList.add('bg-rose-100','ring-8','ring-rose-100');e.dataTransfer.dropEffect='move'});list.addEventListener('dragleave',e=>{if(!list.contains(e.relatedTarget))clearDropTargets()});list.addEventListener('drop',e=>{e.preventDefault();clearDropTargets();moveTask(e.dataTransfer.getData('text/plain'),status)})});
+      const backdrop=document.querySelector('#modal-backdrop'),form=document.querySelector('#task-form');let editingId=null,modalTimer=null;
+      function openModal(status='todo'){clearTimeout(modalTimer);editingId=null;form.reset();form.elements.status.value=status;document.querySelector('#modal-title').textContent='Nova tarefa';form.querySelector('.save').textContent='Salvar tarefa';backdrop.classList.remove('hidden');backdrop.classList.add('flex');requestAnimationFrame(()=>{backdrop.classList.remove('opacity-0');backdrop.classList.add('opacity-100');form.classList.remove('scale-95','opacity-0');form.classList.add('scale-100','opacity-100')});form.elements.title.focus()}
+      function editTask(id){clearTimeout(modalTimer);const task=tasks.find(t=>t.id===id);if(!task)return;editingId=id;form.elements.title.value=task.title;form.elements.description.value=task.description||'';form.elements.tag.value=task.tag;form.elements.status.value=task.status;document.querySelector('#modal-title').textContent='Editar tarefa';form.querySelector('.save').textContent='Salvar alterações';backdrop.classList.remove('hidden');backdrop.classList.add('flex');requestAnimationFrame(()=>{backdrop.classList.remove('opacity-0');backdrop.classList.add('opacity-100');form.classList.remove('scale-95','opacity-0');form.classList.add('scale-100','opacity-100')});form.elements.title.focus()}
+      function closeModal(){if(backdrop.classList.contains('hidden'))return;clearTimeout(modalTimer);backdrop.classList.add('opacity-0');backdrop.classList.remove('opacity-100');form.classList.add('scale-95','opacity-0');form.classList.remove('scale-100','opacity-100');modalTimer=setTimeout(()=>{backdrop.classList.add('hidden');backdrop.classList.remove('flex')},200)}
+      document.querySelector('#add-task').addEventListener('click',()=>openModal());document.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>openModal(b.dataset.add)));document.querySelector('#close-modal').addEventListener('click',closeModal);document.querySelector('#cancel-modal').addEventListener('click',closeModal);backdrop.addEventListener('click',e=>{if(e.target===backdrop)closeModal()});
+      form.addEventListener('submit',async e=>{e.preventDefault();const d=new FormData(form);if(editingId){const task=tasks.find(t=>t.id===editingId);if(task){Object.assign(task,{title:d.get('title').trim(),description:d.get('description').trim(),tag:d.get('tag'),status:d.get('status')});persist();render();await syncTask(task)}closeModal();toast('Tarefa atualizada');return}const task={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),title:d.get('title').trim(),description:d.get('description').trim(),tag:d.get('tag'),status:d.get('status'),date:''};tasks.push(task);persist();render();await syncTask(task);closeModal();toast('Tarefa criada')});
+      document.querySelector('#search-tasks').addEventListener('input',()=>render(false));document.querySelector('#filter-tag').addEventListener('change',()=>render(false));
+      let toastTimer;function toast(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.remove('opacity-0','translate-y-3');el.classList.add('opacity-100','translate-y-0');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.classList.add('opacity-0','translate-y-3');el.classList.remove('opacity-100','translate-y-0')},1900)}
+      const authForm=document.querySelector('#auth-form'),authModeToggle=document.querySelector('#auth-toggle'),authMessage=document.querySelector('#auth-message'),authSubmit=document.querySelector('#auth-submit');let authMode='signin';
+      function setAuthMode(mode){authMode=mode;const signup=mode==='signup';document.querySelector('#auth-title').textContent=signup?'Criar conta':'Entrar';document.querySelector('#auth-description').textContent=signup?'Crie sua conta para salvar e sincronizar suas tarefas.':'Entre para acessar e sincronizar suas tarefas.';authSubmit.textContent=signup?'Criar conta':'Entrar';authModeToggle.textContent=signup?'Já tenho uma conta':'Criar uma conta';document.querySelector('#auth-password').autocomplete=signup?'new-password':'current-password';authMessage.textContent=''}
+      authModeToggle.addEventListener('click',()=>setAuthMode(authMode==='signin'?'signup':'signin'));
+      if(!supabaseClient){document.querySelector('#auth-config-warning').hidden=false;authSubmit.disabled=true;authMessage.textContent='A conexão ainda não foi configurada.'}
+      authForm.addEventListener('submit',async e=>{e.preventDefault();if(!supabaseClient)return;authSubmit.disabled=true;authMessage.classList.remove('text-rose-700');authMessage.classList.add('text-zinc-500');authMessage.textContent=authMode==='signup'?'Criando conta...':'Entrando...';const email=document.querySelector('#auth-email').value.trim(),password=document.querySelector('#auth-password').value;let result;if(authMode==='signup')result=await supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:window.location.href}});else result=await supabaseClient.auth.signInWithPassword({email,password});authSubmit.disabled=false;authMessage.classList.remove('text-zinc-500');authMessage.classList.add('text-rose-700');if(result.error){authMessage.textContent=result.error.message;return}if(authMode==='signup'&&!result.data.session){authMessage.textContent='Conta criada. Confira seu e-mail para confirmar o cadastro.';return}authMessage.textContent='';if(result.data.session)await activateSession(result.data.session.user)});
+      document.querySelector('#sign-out').addEventListener('click',async()=>{if(!supabaseClient)return;const{error}=await supabaseClient.auth.signOut({scope:'local'});if(error){toast('Erro ao sair: '+error.message);return}showSignedOut()});
+      if(supabaseClient){supabaseClient.auth.onAuthStateChange((event,session)=>{setTimeout(()=>{if(session?.user)activateSession(session.user);else if(event==='SIGNED_OUT')showSignedOut()},0)});const{data,error}=await supabaseClient.auth.getSession();if(error){authMessage.textContent=error.message}else if(data.session)await activateSession(data.session.user)}
+      render();
+    })();
+  </script>
+</body>
+</html>

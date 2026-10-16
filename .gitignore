@@ -1,0 +1,11 @@
+# Dependências e configurações locais
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Arquivos do sistema e editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
